@@ -3,11 +3,11 @@ import { WorkspaceSchema } from '@schematics/angular/utility/workspace-models';
 
 import * as fs from 'fs';
 import * as path from 'path';
+import * as ts from 'typescript';
+import * as ng from '@angular/language-service';
 import { ClassChanges, BindingChanges, SelectorChange, SelectorChanges, ThemePropertyChanges, ImportsChanges } from './schema';
-import { getLanguageService, getRenamePositions } from './tsUtils';
+import { getLanguageService, getRenamePositions, getNgLanguageService, getLanguageServiceHost, getNgServiceHost } from './tsUtils';
 import { getProjectPaths, getWorkspace, getProjects, escapeRegExp } from './util';
-import { LanguageService } from 'typescript';
-
 
 export enum InputPropertyType {
     EVAL = 'eval',
@@ -58,7 +58,7 @@ export class UpdateChanges {
     }
 
     private _sassFiles: string[] = [];
-    /** Sass (both .scss and .sass) files in the project being updagraded. */
+    /** Sass (both .scss and .sass) files in the project being updated. */
     public get sassFiles(): string[] {
         if (!this._sassFiles.length) {
             // files can be outside the app prefix, so start from sourceRoot
@@ -73,12 +73,36 @@ export class UpdateChanges {
         return this._sassFiles;
     }
 
-    private _service: LanguageService;
-    public get service(): LanguageService {
+    private _service: ts.LanguageService;
+    public get service(): ts.LanguageService {
         if (!this._service) {
-            this._service = getLanguageService(this.tsFiles, this.host);
+            this._service = getLanguageService(this.serviceHost);
         }
         return this._service;
+    }
+
+    private _serviceHost: ts.LanguageServiceHost;
+    public get serviceHost(): ts.LanguageServiceHost {
+        if (!this._serviceHost) {
+            this._serviceHost = getLanguageServiceHost([...this.tsFiles, ...this.templateFiles], this.host);
+        }
+        return this._serviceHost;
+    }
+
+    private _ngService: ng.LanguageService;
+    public get ngService(): ng.LanguageService {
+        if (!this._ngService) {
+            this._ngService = getNgLanguageService(this.serviceHost, this.service);
+        }
+        return this._ngService;
+    }
+
+    private _ngServiceHost: ng.TypeScriptServiceHost;
+    public get ngServiceHost(): ng.TypeScriptServiceHost {
+        if (!this._ngServiceHost) {
+            this._ngServiceHost = getNgServiceHost(this.serviceHost, this.service);
+        }
+        return this._ngServiceHost;
     }
 
     /**
@@ -271,8 +295,8 @@ export class UpdateChanges {
                         transform(args);
                         if (args.bindingType !== bindingType) {
                             replaceStatement = args.bindingType === InputPropertyType.EVAL ?
-                            replaceStatement.replace(`$1`, `$1[`).replace(`$2`, `]$2`) :
-                            replaceStatement.replace(`$1`, regExpMatch[1].replace('[', '')).replace('$2', regExpMatch[2].replace(']', ''));
+                                replaceStatement.replace(`$1`, `$1[`).replace(`$2`, `]$2`) :
+                                replaceStatement.replace(`$1`, regExpMatch[1].replace('[', '')).replace('$2', regExpMatch[2].replace(']', ''));
 
                         }
                         replaceStatement = replaceStatement.replace('$4', args.value);

@@ -16,6 +16,8 @@ export class GridSelectionComponent implements AfterViewInit {
     selection = true;
     selectionModes = ['none', 'single', 'multiple'];
 
+    public selectedRows = [];
+
     constructor(private remoteService: RemoteService, private cdr: ChangeDetectorRef) {
         this.remoteService.urlBuilder = (state) => this.remoteService.url;
      }
@@ -24,6 +26,9 @@ export class GridSelectionComponent implements AfterViewInit {
         this.remote = this.remoteService.remoteData;
         this.remoteService.getData(this.grid1.data);
         this.cdr.detectChanges();
+        this.remote.subscribe((data) => {
+            this.selectedRows = [data[0].rowID, data[1].rowID]
+        });
     }
 
     public onRowSelection(event) {

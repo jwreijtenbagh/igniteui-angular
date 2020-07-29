@@ -5,6 +5,15 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Attach by Process ID",
+            "processId": "${command:PickProcess}",
+            "request": "attach",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "type": "pwa-node"
+        },
+        {
             "type": "node",
             "request": "launch",
             "name": "Launch Node migration tests",
@@ -12,7 +21,7 @@
                 "-r",
                 "ts-node/register",
                 "./node_modules/jasmine/bin/jasmine.js",
-                "./projects/igniteui-angular/migrations/common/UpdateChanges.spec.ts"
+                "./projects/igniteui-angular/migrations/**/*.spec.ts"
             ],
             "env": {
                 "TS_NODE_PROJECT": "projects/igniteui-angular/migrations/tsconfig.json"

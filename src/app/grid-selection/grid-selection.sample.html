@@ -15,7 +15,7 @@
         </igx-drop-down>
     <div class="separator"></div>
     <igx-grid #grid1 [data]="remote | async" [allowFiltering]='true' [primaryKey]="'ProductID'" (onSelection)="handleRowSelection($event)"
-            [width]="'800px'" [height]="'600px'"  (onRowSelectionChange)="log($event)">
+            [width]="'800px'" [height]="'600px'" [selectedRows]="selectedRows" (onRowSelectionChange)="log($event)">
         <igx-column [field]="'ProductID'" [editable]="true" [width]="'80%'"></igx-column>
         <igx-column [field]="'ProductName'"></igx-column>
         <igx-column [field]="'UnitsInStock'"></igx-column>
