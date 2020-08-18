@@ -1408,7 +1408,19 @@ describe('IgxDatePicker', () => {
 
         it('should initialize date picker with required correctly', () => {
             const datePicker = new IgxDatePickerComponent(overlay, element, cdr, moduleRef, injector);
-            datePicker['inputGroup'] = inputGroup;
+            datePicker['_inputGroup'] = inputGroup;
+            ngModel.control.validator = () => ({ required: true });
+            datePicker.ngOnInit();
+            datePicker.ngAfterViewInit();
+            datePicker.ngAfterViewChecked();
+
+            expect(datePicker).toBeDefined();
+            expect(inputGroup.isRequired).toBeTruthy();
+        });
+
+        it('should initialize date picker with required correctly with user template input-group', () => {
+            const datePicker = new IgxDatePickerComponent(overlay, element, cdr, moduleRef, injector);
+            datePicker['_inputGroupUserTemplate'] = inputGroup;
             ngModel.control.validator = () => ({ required: true });
             datePicker.ngOnInit();
             datePicker.ngAfterViewInit();
@@ -1420,7 +1432,7 @@ describe('IgxDatePicker', () => {
 
         it('should update inputGroup isRequired correctly', () => {
             const datePicker = new IgxDatePickerComponent(overlay, element, cdr, moduleRef, injector);
-            datePicker['inputGroup'] = inputGroup;
+            datePicker['_inputGroup'] = inputGroup;
             datePicker.ngOnInit();
             datePicker.ngAfterViewInit();
             datePicker.ngAfterViewChecked();
