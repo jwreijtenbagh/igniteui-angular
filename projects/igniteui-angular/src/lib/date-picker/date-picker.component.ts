@@ -364,9 +364,7 @@ export class IgxDatePickerComponent implements IDatePicker, ControlValueAccessor
         return '';
     }
 
-    /**
-     * @hidden @internal
-     */
+    /** @hidden @internal */
     public get transformedDate(): string {
         if (this._value) {
             this._transformedDate = (this._isInEditMode) ? this._getEditorDate(this._value) : this._getDisplayDate(this._value);
@@ -377,9 +375,7 @@ export class IgxDatePickerComponent implements IDatePicker, ControlValueAccessor
         return this._transformedDate;
     }
 
-    /**
-     * @hidden @internal
-     */
+    /** @hidden @internal */
     public set transformedDate(value) {
         this._transformedDate = value;
     }
@@ -787,9 +783,7 @@ export class IgxDatePickerComponent implements IDatePicker, ControlValueAccessor
         return this._inputDirective || this._inputDirectiveUserTemplate || null;
     }
 
-    /**
-     * @hidden @internal
-     */
+    /** @hidden @internal */
     public ngOnInit(): void {
         this._positionSettings = {
             openAnimation: fadeIn,
@@ -857,9 +851,7 @@ export class IgxDatePickerComponent implements IDatePicker, ControlValueAccessor
         this._ngControl = this._injector.get<NgControl>(NgControl, null);
     }
 
-    /**
-     * @hidden @internal
-     */
+    /** @hidden @internal */
     public ngAfterViewInit() {
         if (this.mode === InteractionMode.DropDown && this._inputElementRef) {
             fromEvent(this._inputElementRef.nativeElement, 'keydown').pipe(
@@ -887,7 +879,7 @@ export class IgxDatePickerComponent implements IDatePicker, ControlValueAccessor
 
     protected onStatusChanged() {
         if ((this._ngControl.control.touched || this._ngControl.control.dirty) &&
-            (this._ngControl.control.validator || this._ngControl.control.asyncValidator) && this.inputGroup) {
+            (this._ngControl.control.validator || this._ngControl.control.asyncValidator)) {
             if (this.inputGroup.isFocused) {
                 this.inputDirective.valid = this._ngControl.valid ? IgxInputState.VALID : IgxInputState.INVALID;
             } else {
@@ -900,9 +892,7 @@ export class IgxDatePickerComponent implements IDatePicker, ControlValueAccessor
         }
     }
 
-    /**
-     * @hidden @internal
-     */
+    /** @hidden @internal */
     public ngOnDestroy(): void {
         if (this._componentID) {
             this._overlayService.hide(this._componentID);
@@ -1048,9 +1038,7 @@ export class IgxDatePickerComponent implements IDatePicker, ControlValueAccessor
         this.openDialog();
     }
 
-    /**
-     * @hidden @internal
-     */
+    /** @hidden @internal */
     public onBlur(event): void {
         this._isInEditMode = false;
         if (this.mode === InteractionMode.DropDown) {
@@ -1062,9 +1050,7 @@ export class IgxDatePickerComponent implements IDatePicker, ControlValueAccessor
         }
     }
 
-    /**
-     * @hidden @internal
-     */
+    /** @hidden @internal */
     public onFocus(): void {
         this._isInEditMode = true;
         if (this.value && this.invalidDate === '') {
@@ -1072,9 +1058,7 @@ export class IgxDatePickerComponent implements IDatePicker, ControlValueAccessor
         }
     }
 
-    /**
-     * @hidden @internal
-     */
+    /** @hidden @internal */
     public onKeyDown(event) {
         switch (event.key) {
             case KEYS.UP_ARROW:
@@ -1098,9 +1082,7 @@ export class IgxDatePickerComponent implements IDatePicker, ControlValueAccessor
         }
     }
 
-    /**
-     * @hidden @internal
-     */
+    /** @hidden @internal */
     public onWheel(event) {
         if (this._isInEditMode) {
             event.preventDefault();
@@ -1110,9 +1092,7 @@ export class IgxDatePickerComponent implements IDatePicker, ControlValueAccessor
         }
     }
 
-    /**
-     * @hidden @internal
-     */
+    /** @hidden @internal */
     public onInput(event) {
         const targetValue = event.target.value;
         const cursorPosition = this._getCursorPosition();
