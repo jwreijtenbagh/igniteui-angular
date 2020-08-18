@@ -20,7 +20,7 @@ import {
     Injector,
     AfterViewChecked
 } from '@angular/core';
-import { ControlValueAccessor, NG_VALUE_ACCESSOR, NgControl, AbstractControl, NG_VALIDATORS, FormControl, ValidationErrors } from '@angular/forms';
+import { ControlValueAccessor, NG_VALUE_ACCESSOR, NgControl, AbstractControl, NG_VALIDATORS, ValidationErrors } from '@angular/forms';
 import {
     IgxCalendarComponent,
     IgxCalendarHeaderTemplateDirective,
