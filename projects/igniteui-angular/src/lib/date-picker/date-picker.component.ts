@@ -304,7 +304,7 @@ export class IgxDatePickerComponent implements IDatePicker, ControlValueAccessor
     }
     public set disabledDates(value: DateRangeDescriptor[]) {
         this._disabledDates = value;
-        if (this._ngControl && this._value && this._disabledDates) {
+        if (this._ngControl && this._ngControl.control && this._ngControl.control.validator && this._value && this._disabledDates) {
             this._ngControl.control.validator({} as AbstractControl);
             this._onChangeCallback(this._value);
         }
@@ -625,10 +625,10 @@ export class IgxDatePickerComponent implements IDatePicker, ControlValueAccessor
      * @hidden
      */
     @ViewChild(IgxInputGroupComponent)
-    protected inputGroup: IgxInputGroupComponent;
+    protected _inputGroup: IgxInputGroupComponent;
 
     @ContentChild(IgxInputGroupComponent)
-    protected inputGroupUserTemplate: IgxInputGroupComponent;
+    protected _inputGroupUserTemplate: IgxInputGroupComponent;
 
     @ViewChild(IgxInputDirective, { read: ElementRef })
     private _inputElementRef: ElementRef;
@@ -743,7 +743,7 @@ export class IgxDatePickerComponent implements IDatePicker, ControlValueAccessor
 
     /** @hidden @internal */
     public validate(control: AbstractControl): ValidationErrors | null {
-        if (this.value && this.disabledDates && isDateInRanges(this.value, this.disabledDates)) {
+        if (control.value && this.disabledDates && isDateInRanges(control.value, this.disabledDates)) {
             return { dateIsDisabled: true };
         }
         return null;
@@ -760,24 +760,31 @@ export class IgxDatePickerComponent implements IDatePicker, ControlValueAccessor
         event.preventDefault();
     }
 
-
     /** @hidden */
     public getEditElement() {
         const inputDirectiveElementRef = this._inputElementRef || this._inputUserTemplateElementRef;
         return (inputDirectiveElementRef) ? inputDirectiveElementRef.nativeElement : null;
     }
 
-    /**
-     * @hidden @internal
-     */
-    public getInputGroupElement() {
-        if (this.inputGroup) {
-            return this.inputGroup.element.nativeElement;
+    /** @hidden @internal */
+    public getInputGroupElement(): HTMLElement {
+        if (this._inputGroup) {
+            return this._inputGroup.element.nativeElement;
         }
-        if (this.inputGroupUserTemplate) {
-            return this.inputGroupUserTemplate.element.nativeElement;
+        if (this._inputGroupUserTemplate) {
+            return this._inputGroupUserTemplate.element.nativeElement;
         }
         return null;
+    }
+
+    /** @hidden @internal */
+    public get inputGroup(): IgxInputGroupComponent {
+        return this._inputGroup || this._inputGroupUserTemplate || null;
+    }
+
+     /** @hidden @internal */
+    public get inputDirective(): IgxInputDirective {
+        return this._inputDirective || this._inputDirectiveUserTemplate || null;
     }
 
     /**
@@ -882,9 +889,9 @@ export class IgxDatePickerComponent implements IDatePicker, ControlValueAccessor
         if ((this._ngControl.control.touched || this._ngControl.control.dirty) &&
             (this._ngControl.control.validator || this._ngControl.control.asyncValidator) && this.inputGroup) {
             if (this.inputGroup.isFocused) {
-                this._inputDirective.valid = this._ngControl.valid ? IgxInputState.VALID : IgxInputState.INVALID;
+                this.inputDirective.valid = this._ngControl.valid ? IgxInputState.VALID : IgxInputState.INVALID;
             } else {
-                this._inputDirective.valid = this._ngControl.valid ? IgxInputState.INITIAL : IgxInputState.INVALID;
+                this.inputDirective.valid = this._ngControl.valid ? IgxInputState.INITIAL : IgxInputState.INVALID;
             }
         }
 
@@ -1316,7 +1323,7 @@ export class IgxDatePickerComponent implements IDatePicker, ControlValueAccessor
 
     public _updateValidityOnBlur() {
         this._onTouchedCallback();
-        const input = this._inputDirective || this._inputDirectiveUserTemplate;
+        const input = this.inputDirective;
         if (input && this._ngControl && !this._ngControl.valid) {
             input.valid = IgxInputState.INVALID;
         } else {
