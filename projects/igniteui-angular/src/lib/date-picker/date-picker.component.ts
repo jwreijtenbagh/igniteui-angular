@@ -313,10 +313,7 @@ export class IgxDatePickerComponent implements IDatePicker, ControlValueAccessor
     }
     public set disabledDates(value: DateRangeDescriptor[]) {
         this._disabledDates = value;
-        if (this._ngControl && this._ngControl.control && this._ngControl.control.validator && this._value && this._disabledDates) {
-            this._ngControl.control.validator({} as AbstractControl);
-            this._onChangeCallback(this._value);
-        }
+        this._onValidatorChange();
     }
 
     /**
@@ -727,8 +724,8 @@ export class IgxDatePickerComponent implements IDatePicker, ControlValueAccessor
     //#region ControlValueAccessor
 
     private _onChangeCallback: (_: Date) => void = noop;
-
     private _onTouchedCallback: () => void = noop;
+    private _onValidatorChange = () => { };
 
     /** @hidden @internal */
     public writeValue(value: Date) {
@@ -747,8 +744,13 @@ export class IgxDatePickerComponent implements IDatePicker, ControlValueAccessor
     public setDisabledState(isDisabled: boolean): void { this.disabled = isDisabled; }
 
     /** @hidden @internal */
-    public validate(control: AbstractControl): ValidationErrors | null {
-        if (control.value && this.disabledDates && isDateInRanges(control.value, this.disabledDates)) {
+    public registerOnValidatorChange(fn: any) {
+        this._onValidatorChange = fn;
+    }
+
+    /** @hidden @internal */
+    public validate(): ValidationErrors | null {
+        if (!!this.value && this.disabledDates && isDateInRanges(this.value, this.disabledDates)) {
             return { dateIsDisabled: true };
         }
         return null;
@@ -772,14 +774,8 @@ export class IgxDatePickerComponent implements IDatePicker, ControlValueAccessor
     }
 
     /** @hidden @internal */
-    public getInputGroupElement(): HTMLElement {
-        if (this._inputGroup) {
-            return this._inputGroup.element.nativeElement;
-        }
-        if (this._inputGroupUserTemplate) {
-            return this._inputGroupUserTemplate.element.nativeElement;
-        }
-        return null;
+    public get inputGroupElement(): HTMLElement {
+        return this.inputGroup?.element.nativeElement;
     }
 
     /** @hidden @internal */
@@ -888,6 +884,7 @@ export class IgxDatePickerComponent implements IDatePicker, ControlValueAccessor
     }
 
     protected onStatusChanged() {
+        const error = this._ngControl.control.validator({} as AbstractControl);
         if ((this._ngControl.control.touched || this._ngControl.control.dirty) &&
             (this._ngControl.control.validator || this._ngControl.control.asyncValidator)) {
             if (this.inputGroup.isFocused) {
@@ -895,6 +892,8 @@ export class IgxDatePickerComponent implements IDatePicker, ControlValueAccessor
             } else {
                 this.inputDirective.valid = this._ngControl.valid ? IgxInputState.INITIAL : IgxInputState.INVALID;
             }
+        } else if ((this._ngControl.control.validator || this._ngControl.control.asyncValidator) && error?.dateIsDisabled === true) {
+            this.inputDirective.valid = this._ngControl.valid ? IgxInputState.INITIAL : IgxInputState.INVALID;
         }
 
         if (this.inputGroup && this.inputGroup.isRequired !== this.required) {
@@ -983,7 +982,7 @@ export class IgxDatePickerComponent implements IDatePicker, ControlValueAccessor
             }
             case InteractionMode.DropDown: {
                 this.hasHeader = false;
-                const target = this.getInputGroupElement();
+                const target = this.inputGroupElement;
                 if (target) {
                     this.dropDownOverlaySettings.positionStrategy.settings.target = target;
                 }

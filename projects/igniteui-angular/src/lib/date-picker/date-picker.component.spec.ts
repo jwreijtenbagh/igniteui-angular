@@ -1290,11 +1290,13 @@ describe('IgxDatePicker', () => {
         let fixture: ComponentFixture<IgxDatePickerReactiveFormComponent>;
         let datePickerOnChangeComponent: IgxDatePickerComponent;
         let datePickerOnBlurComponent: IgxDatePickerComponent;
+        let datePickerTemplateIGComponent: IgxDatePickerComponent;
 
         beforeEach(() => {
             fixture = TestBed.createComponent(IgxDatePickerReactiveFormComponent);
             datePickerOnChangeComponent = fixture.componentInstance.datePickerOnChangeComponent;
             datePickerOnBlurComponent = fixture.componentInstance.datePickerOnBlurComponent;
+            datePickerTemplateIGComponent = fixture.componentInstance.datePickerTemplateIGComponent;
             fixture.detectChanges();
         });
 
@@ -1354,6 +1356,27 @@ describe('IgxDatePicker', () => {
             expect(inputDirective.valid).toEqual(IgxInputState.INITIAL);
 
             datePickerOnChangeComponent.disabledDates = [{ type: DateRangeType.Before,
+                                            dateRange: [new Date(today.getFullYear(), today.getMonth(), today.getDate() + 2)] }];
+            fixture.detectChanges();
+            expect(inputDirective.valid).toEqual(IgxInputState.INVALID);
+        }));
+
+        it('Should set date picker status to invalid if date is included in disabledDates range and user pass a template', fakeAsync(() => {
+            datePickerTemplateIGComponent.disabledDates = [{ type: DateRangeType.Before, dateRange: [new Date()] }];
+            const inputGroupsElements = fixture.debugElement.queryAll(By.directive(IgxInputDirective));
+            const inputGroupElement = inputGroupsElements.find(d => d.componentInstance === datePickerTemplateIGComponent);
+            const inputDirective = inputGroupElement.injector.get(IgxInputDirective) as IgxInputDirective;
+
+            const today = new Date();
+            datePickerTemplateIGComponent.value = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 1);
+            fixture.detectChanges();
+            expect(inputDirective.valid).toEqual(IgxInputState.INVALID);
+
+            datePickerTemplateIGComponent.value = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
+            fixture.detectChanges();
+            expect(inputDirective.valid).toEqual(IgxInputState.INITIAL);
+
+            datePickerTemplateIGComponent.disabledDates = [{ type: DateRangeType.Before,
                                             dateRange: [new Date(today.getFullYear(), today.getMonth(), today.getDate() + 2)] }];
             fixture.detectChanges();
             expect(inputDirective.valid).toEqual(IgxInputState.INVALID);
@@ -1600,6 +1623,18 @@ export class IgxDatePickerOpeningComponent {
     <form [formGroup]="reactiveForm">
         <igx-date-picker formControlName="datePickerOnChange" #datePickerOnChangeComponent></igx-date-picker>
         <igx-date-picker formControlName="datePickerOnBlur" #datePickerOnBlurComponent></igx-date-picker>
+        <igx-date-picker formControlName="datePickerIGTemplate" #datePickerTemplateIGComponent>
+            <ng-template igxDatePickerTemplate let-openDialog="openDialog" let-value="value"
+                let-displayData="displayData">
+                <igx-input-group>
+                    <label igxLabel>Date</label>
+                    <input igxInput [value]="displayData"/>
+                    <igx-suffix>
+                        <igx-icon>today</igx-icon>
+                    </igx-suffix>
+                </igx-input-group>
+            </ng-template>
+        </igx-date-picker>
     </form>
 `
 })
@@ -1610,13 +1645,17 @@ class IgxDatePickerReactiveFormComponent {
     @ViewChild('datePickerOnBlurComponent', { read: IgxDatePickerComponent, static: true })
     public datePickerOnBlurComponent: IgxDatePickerComponent;
 
+    @ViewChild('datePickerTemplateIGComponent', { read: IgxDatePickerComponent, static: true })
+    public datePickerTemplateIGComponent: IgxDatePickerComponent;
+
     reactiveForm: FormGroup;
 
     constructor(fb: FormBuilder) {
         const date = new Date(2000, 10, 15);
         this.reactiveForm = fb.group({
             datePickerOnChange: [date, Validators.required],
-            datePickerOnBlur: [date, { updateOn: 'blur', validators: Validators.required }]
+            datePickerOnBlur: [date, { updateOn: 'blur', validators: Validators.required }],
+            datePickerIGTemplate: [date, Validators.required]
         });
     }
 }
