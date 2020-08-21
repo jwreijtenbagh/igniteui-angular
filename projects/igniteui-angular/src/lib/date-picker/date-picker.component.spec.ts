@@ -38,11 +38,10 @@ describe('IgxDatePicker', () => {
                 IgxDropDownDatePickerRetemplatedComponent,
                 IgxDatePickerOpeningComponent,
                 IgxDatePickerReactiveFormComponent,
-                IgxDatePickerDropdownButtonsComponent,
-                IgxIconModule
+                IgxDatePickerDropdownButtonsComponent
             ],
             imports: [IgxDatePickerModule, FormsModule, ReactiveFormsModule, NoopAnimationsModule, IgxInputGroupModule, IgxCalendarModule,
-                IgxButtonModule, IgxTextSelectionModule]
+                IgxButtonModule, IgxTextSelectionModule, IgxIconModule]
         })
             .compileComponents();
     }));
