@@ -14,6 +14,7 @@ import { IgxButtonModule } from '../directives/button/button.directive';
 import { IgxCalendarModule } from '../calendar/public_api';
 import { InteractionMode } from '../core/enums';
 import { DateRangeType } from '../core/dates/dateRange';
+import { IgxIconModule } from '../icon/public_api';
 import {
     OverlayCancelableEventArgs,
     OverlayClosingEventArgs,
@@ -37,7 +38,8 @@ describe('IgxDatePicker', () => {
                 IgxDropDownDatePickerRetemplatedComponent,
                 IgxDatePickerOpeningComponent,
                 IgxDatePickerReactiveFormComponent,
-                IgxDatePickerDropdownButtonsComponent
+                IgxDatePickerDropdownButtonsComponent,
+                IgxIconModule
             ],
             imports: [IgxDatePickerModule, FormsModule, ReactiveFormsModule, NoopAnimationsModule, IgxInputGroupModule, IgxCalendarModule,
                 IgxButtonModule, IgxTextSelectionModule]
