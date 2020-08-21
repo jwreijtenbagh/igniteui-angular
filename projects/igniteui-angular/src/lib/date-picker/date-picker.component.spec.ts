@@ -1364,9 +1364,7 @@ describe('IgxDatePicker', () => {
 
         it('Should set date picker status to invalid if date is included in disabledDates range and user pass a template', fakeAsync(() => {
             datePickerTemplateIGComponent.disabledDates = [{ type: DateRangeType.Before, dateRange: [new Date()] }];
-            const inputGroupsElements = fixture.debugElement.queryAll(By.directive(IgxInputDirective));
-            const inputGroupElement = inputGroupsElements.find(d => d.componentInstance === datePickerTemplateIGComponent);
-            const inputDirective = inputGroupElement.injector.get(IgxInputDirective) as IgxInputDirective;
+            const inputDirective = datePickerTemplateIGComponent.inputDirective;
 
             const today = new Date();
             datePickerTemplateIGComponent.value = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 1);
