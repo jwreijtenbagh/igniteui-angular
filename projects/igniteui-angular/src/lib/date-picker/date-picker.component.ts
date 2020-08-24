@@ -884,16 +884,13 @@ export class IgxDatePickerComponent implements IDatePicker, ControlValueAccessor
     }
 
     protected onStatusChanged() {
-        const error = this._ngControl.control.validator({} as AbstractControl);
-        if ((this._ngControl.control.touched || this._ngControl.control.dirty) &&
-            (this._ngControl.control.validator || this._ngControl.control.asyncValidator)) {
+        if ((this._ngControl.control.touched || this._ngControl.control.dirty) ||
+            (this.inputDirective && this._ngControl.control.validator || this._ngControl.control.asyncValidator)) {
             if (this.inputGroup.isFocused) {
                 this.inputDirective.valid = this._ngControl.valid ? IgxInputState.VALID : IgxInputState.INVALID;
             } else {
                 this.inputDirective.valid = this._ngControl.valid ? IgxInputState.INITIAL : IgxInputState.INVALID;
             }
-        } else if ((this._ngControl.control.validator || this._ngControl.control.asyncValidator) && error?.dateIsDisabled === true) {
-            this.inputDirective.valid = this._ngControl.valid ? IgxInputState.INITIAL : IgxInputState.INVALID;
         }
 
         if (this.inputGroup && this.inputGroup.isRequired !== this.required) {
