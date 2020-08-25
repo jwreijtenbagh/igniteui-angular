@@ -18,7 +18,9 @@ import {
     OnInit,
     AfterViewInit,
     Injector,
-    AfterViewChecked
+    AfterViewChecked,
+    ContentChildren,
+    QueryList
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR, NgControl, AbstractControl, NG_VALIDATORS, FormControl, ValidationErrors } from '@angular/forms';
 import {
@@ -641,8 +643,8 @@ export class IgxDatePickerComponent implements IDatePicker, ControlValueAccessor
     @ViewChild(IgxInputDirective)
     private _inputDirective: IgxInputDirective;
 
-    @ContentChild(IgxInputDirective)
-    private _inputDirectiveUserTemplate: IgxInputDirective;
+    @ContentChildren(IgxInputDirective, { descendants: true })
+    private _inputDirectiveUserTemplates: QueryList<IgxInputDirective>;
 
     /**
      * @hidden
@@ -705,6 +707,7 @@ export class IgxDatePickerComponent implements IDatePicker, ControlValueAccessor
     };
     private _destroy$ = new Subject<boolean>();
     private _statusChanges$: Subscription;
+    private _templateInputBlur$: Subscription;
     private _componentID: string;
     private _format: string;
     private _value: Date;
@@ -785,7 +788,7 @@ export class IgxDatePickerComponent implements IDatePicker, ControlValueAccessor
 
      /** @hidden @internal */
     public get inputDirective(): IgxInputDirective {
-        return this._inputDirective || this._inputDirectiveUserTemplate || null;
+        return this._inputDirective || this._inputDirectiveUserTemplates.first || null;
     }
 
     /** @hidden @internal */
@@ -868,6 +871,23 @@ export class IgxDatePickerComponent implements IDatePicker, ControlValueAccessor
 
         if (this._ngControl) {
             this._statusChanges$ = this._ngControl.statusChanges.subscribe(this.onStatusChanged.bind(this));
+        }
+
+        this._inputDirectiveUserTemplates.changes.subscribe(() => {
+            this.attachTemplateBlur();
+         });
+        this.attachTemplateBlur();
+    }
+
+    private attachTemplateBlur() {
+        if (this._templateInputBlur$) {
+            this._templateInputBlur$.unsubscribe();
+        }
+
+        if (this._inputDirectiveUserTemplates.first) {
+            const directive = this._inputDirectiveUserTemplates.first;
+            this._templateInputBlur$ = fromEvent(directive.nativeElement, 'blur').pipe(
+                takeUntil(this._destroy$)).subscribe((res) => this.onBlur(res));
         }
     }
 
